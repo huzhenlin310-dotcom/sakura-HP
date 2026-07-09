@@ -1,0 +1,716 @@
+const site = {
+  eventDate: "2026年4月予定",
+  place: "JAIST キャンパス内 特設エリア",
+  address: "石川県能美市旭台1-1",
+  contactEmail: "sakura@example.jp",
+  links: {
+    gajumaru: "https://example.com/gajumaru",
+    jaist: "https://www.jaist.ac.jp/",
+    momiji: "https://example.com/momiji",
+    instagram: "https://example.com/sns",
+  },
+};
+
+// Placeholder data. Replace these objects after each department confirms official information.
+const projects = [
+  {
+    title: "春の屋台ストリート",
+    description: "学生団体による軽食とドリンクの屋台エリアです。",
+    time: "11:00から15:30",
+    place: "中央広場",
+    category: "Food",
+    audience: "友人同士、家族連れ",
+    recommend: "短い時間でも祭りの雰囲気を楽しめます。",
+  },
+  {
+    title: "研究室オープン企画",
+    description: "研究内容を学生がわかりやすく紹介します。",
+    time: "12:30から14:30",
+    place: "講義棟 1F",
+    category: "Campus",
+    audience: "初めてJAISTに来る方",
+    recommend: "キャンパスらしさを感じられる企画です。",
+  },
+  {
+    title: "SAKURAステージ",
+    description: "音楽、パフォーマンス、サークル発表を行います。",
+    time: "13:00から16:00",
+    place: "特設ステージ",
+    category: "Stage",
+    audience: "ライブ感を楽しみたい方",
+    recommend: "会場の一体感が伝わる中心企画です。",
+  },
+  {
+    title: "子ども向けワークショップ",
+    description: "親子で参加しやすいものづくり体験です。",
+    time: "10:30から12:00",
+    place: "学生会館",
+    category: "Workshop",
+    audience: "小さなお子さま連れ",
+    recommend: "落ち着いた屋内で参加できます。",
+  },
+  {
+    title: "桜フォトスポット",
+    description: "記念写真を撮れる春らしい装飾エリアです。",
+    time: "終日",
+    place: "正門付近",
+    category: "Photo",
+    audience: "来場者全員",
+    recommend: "来場の記念を残しやすい企画です。",
+  },
+];
+
+const faqs = [
+  ["開催日はいつですか？", "開催日は2026年4月を予定しています。正式な日程は確定後に更新します。"],
+  ["雨天でも開催しますか？", "小雨の場合は一部内容を変更して実施予定です。荒天時の判断は前日までに掲載します。"],
+  ["予約は必要ですか？", "通常来場は予約不要です。一部ワークショップのみ事前申込制になる場合があります。"],
+  ["学外からも参加できますか？", "はい。学生、教職員、地域の方、学外の方も参加できます。"],
+  ["駐車場はありますか？", "駐車台数には限りがあります。公共交通機関またはシャトルバスの利用をおすすめします。"],
+  ["子ども連れでも参加できますか？", "はい。お子さまと一緒に参加できる企画も準備予定です。"],
+  ["飲食の出店はありますか？", "飲食企画を予定しています。出店内容は確定後に企画ページへ掲載します。"],
+  ["困ったときは誰に聞けばよいですか？", "当日は本部テントへお越しください。事前のお問い合わせは contact us からお願いします。"],
+];
+
+const photos = [
+  ["屋台エリア", "82% 68%"],
+  ["ステージ発表", "58% 62%"],
+  ["キャンパス散策", "45% 58%"],
+  ["学生スタッフ", "34% 72%"],
+  ["交流スペース", "18% 55%"],
+  ["春の記念写真", "62% 24%"],
+];
+
+const heroPhotos = [
+  ["春のキャンパスで開かれるSAKURA祭りのイメージ", "center"],
+  ["学生と地域が集まるキャンパスイベントのイメージ", "78% 62%"],
+  ["屋外企画と桜の雰囲気を伝えるイメージ", "28% 54%"],
+];
+
+const routeShells = [
+  "/about-sakura/",
+  "/projects/",
+  "/projects/recommend/",
+  "/projects/search/",
+  "/history/",
+  "/guide/",
+  "/guide/access/",
+  "/guide/rules/",
+  "/qa/",
+  "/about-us/",
+  "/about-us/gajumaru/",
+  "/about-us/contact/",
+];
+
+const nav = [
+  ["TOP", "/"],
+  ["桜祭りとは", "/about-sakura/"],
+  ["企画", "/projects/search/"],
+  ["これまでの桜祭り", "/history/"],
+  ["ご案内", "/guide/access/"],
+  ["Q/A", "/qa/"],
+  ["about us", "/about-us/gajumaru/"],
+];
+
+function normalizePath(pathname) {
+  if (!pathname || pathname === "/index.html") return "/";
+  let path = pathname.endsWith("/") ? pathname : `${pathname}/`;
+  if (path.endsWith("/index.html/")) path = path.replace("/index.html/", "/");
+  return path;
+}
+
+function isActive(current, href) {
+  if (href === "/") return current === "/";
+  return current.startsWith(href.replace(/\/$/, ""));
+}
+
+function header(current) {
+  const navLinks = nav
+    .map(([label, href]) => `<a class="nav-link ${isActive(current, href) ? "active" : ""}" href="${href}">${label}</a>`)
+    .join("");
+
+  return `
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" href="/" aria-label="SAKURA祭り TOP">
+          <span class="brand-mark">桜</span>
+          <span>SAKURA祭り</span>
+        </a>
+        <nav class="desktop-nav" aria-label="メインナビゲーション">${navLinks}</nav>
+        <button class="menu-toggle" type="button" aria-label="メニューを開く" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+      <nav class="mobile-menu" aria-label="モバイルナビゲーション">${navLinks}</nav>
+    </header>
+  `;
+}
+
+function footer() {
+  return `
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div>
+          <a class="brand" href="/">
+            <span class="brand-mark">桜</span>
+            <span>SAKURA祭り</span>
+          </a>
+          <p class="copyright">学生と地域が春のキャンパスで出会う一日。内容は確認中のため、一部は仮情報です。</p>
+          <p class="copyright">© 2026 SAKURA祭り実行委員会</p>
+        </div>
+        <div class="footer-links">
+          <a href="${site.links.gajumaru}" target="_blank" rel="noreferrer">ガジュマル会 HP</a>
+          <a href="${site.links.jaist}" target="_blank" rel="noreferrer">JAIST HP</a>
+          <a href="${site.links.momiji}" target="_blank" rel="noreferrer">紅葉祭り</a>
+          <a href="/about-us/contact/">contact us</a>
+          <a href="${site.links.instagram}" target="_blank" rel="noreferrer">SNS</a>
+        </div>
+      </div>
+    </footer>
+  `;
+}
+
+function sectionTitle(title, lead) {
+  return `
+    <div class="section-title">
+      <h2>${title}</h2>
+      ${lead ? `<p>${lead}</p>` : ""}
+    </div>
+  `;
+}
+
+function button(label, href, variant = "primary", extra = "") {
+  return `<a class="btn ${variant} ${extra}" href="${href}">${label}</a>`;
+}
+
+function projectCard(project, showReason = false) {
+  return `
+    <article class="project-card" data-title="${project.title}" data-category="${project.category}" data-place="${project.place}" data-time="${project.time}">
+      <header>
+        <h3>${project.title}</h3>
+        <span class="tag">${project.category}</span>
+      </header>
+      <p>${project.description}</p>
+      <div class="project-meta">
+        <span><strong>時間:</strong> ${project.time}</span>
+        <span><strong>場所:</strong> ${project.place}</span>
+        ${showReason ? `<span><strong>おすすめ:</strong> ${project.recommend}</span>` : ""}
+        ${showReason ? `<span><strong>こんな人に:</strong> ${project.audience}</span>` : ""}
+      </div>
+      ${button("詳細を見る", "/projects/search/", "secondary")}
+    </article>
+  `;
+}
+
+function gallery(limit = photos.length) {
+  return `
+    <div class="gallery-scroll">
+      ${photos
+        .slice(0, limit)
+        .map(([label, position]) => `<figure class="photo-tile" style="--photo-position:${position};"><span>${label}</span></figure>`)
+        .join("")}
+    </div>
+  `;
+}
+
+function heroCarousel() {
+  return `
+    <div class="hero-carousel" data-hero-carousel aria-label="SAKURA祭りの写真スライド">
+      <div class="hero-track" data-hero-track>
+        ${heroPhotos
+          .map(
+            ([label, position], index) => `
+              <div class="hero-slide" style="--photo-position:${position};" role="img" aria-label="${label}" data-slide-index="${index}"></div>
+            `
+          )
+          .join("")}
+      </div>
+      <button class="carousel-arrow prev" type="button" data-carousel-prev aria-label="前の写真を見る">‹</button>
+      <button class="carousel-arrow next" type="button" data-carousel-next aria-label="次の写真を見る">›</button>
+      <div class="carousel-dots" aria-label="写真スライドの位置">
+        ${heroPhotos
+          .map(
+            ([label], index) => `
+              <button class="carousel-dot ${index === 0 ? "active" : ""}" type="button" data-carousel-dot="${index}" aria-label="${index + 1}枚目の写真を見る" aria-current="${index === 0 ? "true" : "false"}"></button>
+            `
+          )
+          .join("")}
+      </div>
+    </div>
+  `;
+}
+
+function aboutPhoto() {
+  return `
+    <figure class="about-photo" aria-label="桜祭りの雰囲気を伝える写真">
+      <div style="--photo-position:58% 62%;"></div>
+    </figure>
+  `;
+}
+
+function accessCard(full = false) {
+  return `
+    <article class="access-card">
+      <div class="map-placeholder" aria-label="学校内MAPの仮表示">
+        <div class="route-line"><strong>正門</strong> から中央広場へ進み、案内看板に沿って特設エリアへお越しください。</div>
+        <div class="route-line"><strong>本部テント</strong> ではパンフレット、落とし物、緊急時の相談を受け付けます。</div>
+      </div>
+      <div class="access-body">
+        <h3>会場: ${site.place}</h3>
+        <p>${site.address}</p>
+        ${full ? routeSteps() : ""}
+        <div class="button-row">
+          ${button("Google Mapを開く", "https://www.google.com/maps/search/?api=1&query=JAIST", "secondary")}
+          ${button("アクセスを見る", "/guide/access/", "primary")}
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function routeSteps() {
+  return `
+    <ol class="step-list">
+      <li><span class="step-num">1</span><span><strong>大学入口へ</strong><br>公共交通機関、シャトルバス、または指定駐車場から案内表示に従ってください。</span></li>
+      <li><span class="step-num">2</span><span><strong>受付を確認</strong><br>パンフレットと当日の変更情報は本部テントで確認できます。</span></li>
+      <li><span class="step-num">3</span><span><strong>企画エリアへ</strong><br>中央広場、講義棟、学生会館を中心に企画を実施予定です。</span></li>
+    </ol>
+  `;
+}
+
+function qaAccordion(list = faqs.slice(0, 4)) {
+  return `
+    <div class="qa-list">
+      ${list
+        .map(
+          ([q, a], index) => `
+            <article class="qa-item ${index === 0 ? "open" : ""}">
+              <button class="qa-question" type="button" aria-expanded="${index === 0 ? "true" : "false"}">
+                <span>${q}</span><span class="qa-symbol">${index === 0 ? "閉じる" : "開く"}</span>
+              </button>
+              <div class="qa-answer">${a}</div>
+            </article>
+          `
+        )
+        .join("")}
+    </div>
+  `;
+}
+
+function externalLinks() {
+  const links = [
+    ["ガジュマル会 HP", "運営組織の活動を見る", site.links.gajumaru],
+    ["JAIST HP", "大学の公式情報を見る", site.links.jaist],
+    ["紅葉祭り", "関連イベントを見る", site.links.momiji],
+  ];
+  return `<div class="external-grid">${links.map(([title, text, href]) => `<a class="external-card" href="${href}" target="_blank" rel="noreferrer"><span><strong>${title}</strong><span>${text}</span></span><span>外部</span></a>`).join("")}</div>`;
+}
+
+function pageHero(title, lead) {
+  return `
+    <section class="page-hero">
+      <div class="container">
+        <p class="eyebrow">SAKURA祭り 公式サイト</p>
+        <h1>${title}</h1>
+        <p class="page-lead">${lead}</p>
+      </div>
+    </section>
+  `;
+}
+
+function topPage() {
+  return `
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <p class="eyebrow">春のキャンパスイベント</p>
+          <h1><span>SAKURA</span><span>祭り</span></h1>
+          <p class="hero-lead">学生、地域、研究の空気がまざる春の一日。企画、屋台、ステージ、キャンパス散策を楽しめるイベントです。</p>
+          <div class="event-meta">
+            <div class="meta-chip"><span class="chip-dot"></span>${site.eventDate}</div>
+            <div class="meta-chip"><span class="chip-dot"></span>${site.place}</div>
+          </div>
+          <div class="button-row">
+            ${button("企画を探す", "/projects/search/", "primary")}
+            ${button("アクセスを見る", "/guide/access/", "secondary")}
+          </div>
+        </div>
+        <figure class="hero-media">
+          ${heroCarousel()}
+          <figcaption>写真、MAP、企画情報は順次更新予定です。</figcaption>
+        </figure>
+      </div>
+    </section>
+    <section class="section soft">
+      <div class="container about-overview">
+        <div>
+          ${sectionTitle("桜祭りとは", "SAKURA祭りは、JAISTの学生と地域の方が気軽につながる春のキャンパスイベントです。")}
+          ${button("詳しく見る", "/about-sakura/", "primary")}
+        </div>
+        ${aboutPhoto()}
+      </div>
+    </section>
+    <section class="section">
+      <div class="container">
+        ${sectionTitle("おすすめ企画", "参加しやすく、SAKURA祭りらしさを感じやすい企画を先に紹介します。")}
+        <div class="grid three featured-projects">${projects.slice(0, 3).map((item) => projectCard(item, true)).join("")}</div>
+        <div class="button-row">${button("企画を探す", "/projects/search/", "primary")}</div>
+      </div>
+    </section>
+    <section class="section soft">
+      <div class="container">
+        ${sectionTitle("これまでの桜祭り", "過去の写真は準備中です。まずは写真を差し替えやすいギャラリー枠を用意しています。")}
+        ${gallery(6)}
+      </div>
+    </section>
+    <section class="section">
+      <div class="container">
+        ${sectionTitle("アクセス", "会場までの行き方と当日の受付場所を確認できます。")}
+        ${accessCard(false)}
+      </div>
+    </section>
+  `;
+}
+
+function aboutSakuraPage() {
+  return `
+    ${pageHero("桜祭りとは", "SAKURA祭りの概要、テーマ、運営メッセージを紹介します。")}
+    <section class="section">
+      <div class="container grid two">
+        <article class="card"><h3>概要</h3><p>SAKURA祭りは、春のキャンパスで学生、教職員、地域の方が交流するイベントです。企画情報は確定後に更新します。</p></article>
+        <article class="card"><h3>テーマ</h3><p>今年のテーマは確認中です。仮テーマとして「春、つながるキャンパス」を設定しています。</p></article>
+        <article class="card"><h3>学長挨拶</h3><p>正式メッセージ準備中。ここには来場者への歓迎文と大学としての想いを掲載します。</p></article>
+        <article class="card"><h3>委員長挨拶</h3><p>実行委員長から、学生主体でつくる祭りへの想いを短く掲載する予定です。</p></article>
+        <article class="card"><h3>活動理念</h3><p>学生らしい挑戦と、地域に開かれたキャンパスづくりを大切にしています。</p></article>
+        <article class="card"><h3>活動特色</h3><p>屋台、ステージ、研究紹介、交流企画を通して、幅広い来場者が楽しめる構成を目指します。</p></article>
+      </div>
+    </section>
+  `;
+}
+
+function projectsOverviewPage() {
+  return `
+    ${pageHero("企画", "おすすめ企画と検索ページから、気になる企画を見つけられます。")}
+    <section class="section">
+      <div class="container grid two">
+        <article class="card"><h3>おすすめ</h3><p>初めての方でも参加しやすい企画を紹介します。</p><div class="button-row">${button("おすすめを見る", "/projects/recommend/", "primary")}</div></article>
+        <article class="card"><h3>企画を探す</h3><p>カテゴリ、時間、場所から企画を絞り込めます。</p><div class="button-row">${button("検索する", "/projects/search/", "primary")}</div></article>
+      </div>
+    </section>
+  `;
+}
+
+function recommendPage() {
+  return `
+    ${pageHero("おすすめ企画", "参加しやすさとSAKURA祭りらしさを基準に選んだ企画です。")}
+    <section class="section">
+      <div class="container grid three">${projects.slice(0, 4).map((item) => projectCard(item, true)).join("")}</div>
+    </section>
+  `;
+}
+
+function projectSearchPage() {
+  const categories = ["すべて", ...new Set(projects.map((item) => item.category))];
+  const places = ["すべて", ...new Set(projects.map((item) => item.place))];
+  return `
+    ${pageHero("企画を探す", "検索とフィルターで、当日まわりたい企画をすばやく確認できます。")}
+    <section class="section">
+      <div class="container">
+        <div class="filter-panel" data-filter-panel>
+          <div class="field"><label for="project-search">検索</label><input id="project-search" type="search" placeholder="企画名、説明、場所で検索"></div>
+          <div class="field"><label for="category-filter">分類</label><select id="category-filter">${categories.map((item) => `<option>${item}</option>`).join("")}</select></div>
+          <div class="field"><label for="time-filter">時間</label><select id="time-filter"><option>すべて</option><option>午前</option><option>午後</option><option>終日</option></select></div>
+          <div class="field"><label for="place-filter">場所</label><select id="place-filter">${places.map((item) => `<option>${item}</option>`).join("")}</select></div>
+        </div>
+        <div class="grid three" data-project-list>${projects.map((item) => projectCard(item, false)).join("")}</div>
+        <p class="form-status" data-empty hidden>条件に合う企画がありません。</p>
+      </div>
+    </section>
+  `;
+}
+
+function historyPage() {
+  return `
+    ${pageHero("これまでの桜祭り", "過去の活動記録、歴年テーマ、参加者の声を掲載するページです。")}
+    <section class="section">
+      <div class="container">
+        ${gallery(6)}
+        <div class="grid three" style="margin-top:24px">
+          <article class="card"><h3>歴年テーマ</h3><p>過去テーマは確認中です。確定後、年ごとの一覧に差し替えます。</p></article>
+          <article class="card"><h3>活動記録</h3><p>実施企画、来場者数、当日の雰囲気を短くまとめます。</p></article>
+          <article class="card"><h3>参加者の声</h3><p>来場者や学生スタッフのコメントを掲載予定です。</p></article>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function guidePage() {
+  return `
+    ${pageHero("ご案内", "アクセスと来場者へのルールをまとめています。")}
+    <section class="section">
+      <div class="container grid two">
+        <article class="card"><h3>アクセス</h3><p>会場までの行き方、シャトルバス、外部地図リンクを確認できます。</p><div class="button-row">${button("アクセスを見る", "/guide/access/", "primary")}</div></article>
+        <article class="card"><h3>来場者へのルール</h3><p>飲食、撮影、ゴミ、緊急時の連絡などを短くまとめています。</p><div class="button-row">${button("ルールを見る", "/guide/rules/", "primary")}</div></article>
+      </div>
+    </section>
+  `;
+}
+
+function accessPage() {
+  return `
+    ${pageHero("アクセス", "初めて来る方にもわかりやすいよう、ルートと当日情報を整理しています。")}
+    <section class="section">
+      <div class="container">
+        <p class="notice">シャトルバス時刻表と校内MAPは確認中です。確定後、この枠に正式情報を掲載します。</p>
+        ${accessCard(true)}
+      </div>
+    </section>
+  `;
+}
+
+function rulesPage() {
+  const rules = [
+    ["入場", "受付や案内表示に従ってご来場ください。一部エリアは立入制限があります。"],
+    ["飲食", "指定エリアでお楽しみください。アレルギー表示は各出店で確認してください。"],
+    ["ゴミ", "分別回収にご協力ください。持ち込み品のゴミはお持ち帰りをお願いします。"],
+    ["撮影", "個人が特定される写真を公開する際は、相手の了承を得てください。"],
+    ["禁止事項", "危険物の持ち込み、無許可販売、周囲に迷惑となる行為は禁止です。"],
+    ["緊急時", "体調不良や困りごとは本部テントまたは近くのスタッフへお知らせください。"],
+  ];
+  return `
+    ${pageHero("来場者へのルール", "当日スマートフォンで確認しやすいよう、短い項目でまとめています。")}
+    <section class="section">
+      <div class="container rule-grid">${rules.map(([title, text]) => `<article class="rule-card"><strong>${title}</strong><p>${text}</p></article>`).join("")}</div>
+    </section>
+  `;
+}
+
+function qaPage() {
+  return `
+    ${pageHero("Q/A", "来場前によくある質問をまとめました。")}
+    <section class="section">
+      <div class="container">${qaAccordion(faqs)}</div>
+    </section>
+  `;
+}
+
+function aboutUsPage() {
+  return `
+    ${pageHero("about us", "SAKURA祭りを運営する組織と連絡先を紹介します。")}
+    <section class="section">
+      <div class="container grid two">
+        <article class="card"><h3>ガジュマル会の会とは</h3><p>学生生活やキャンパスイベントを支える組織です。</p><div class="button-row">${button("詳しく見る", "/about-us/gajumaru/", "primary")}</div></article>
+        <article class="card"><h3>contact us</h3><p>お問い合わせフォーム、メール、SNSリンクを掲載しています。</p><div class="button-row">${button("問い合わせる", "/about-us/contact/", "primary")}</div></article>
+      </div>
+    </section>
+  `;
+}
+
+function gajumaruPage() {
+  return `
+    ${pageHero("ガジュマル会の会とは", "SAKURA祭りと関わる学生組織の活動を紹介します。")}
+    <section class="section">
+      <div class="container grid two">
+        <article class="card"><h3>ガジュマル会とは</h3><p>学生が主体となり、交流やイベントづくりを進める団体です。正式説明は確認中です。</p></article>
+        <article class="card"><h3>活動内容</h3><p>イベント運営、学生交流、地域との連携などを行っています。</p></article>
+        <article class="card"><h3>SAKURA祭りとの関係</h3><p>企画調整、当日運営、広報などでSAKURA祭りを支えます。</p></article>
+        <article class="card"><h3>組織理念</h3><p>学生らしいアイデアを形にし、誰もが参加しやすい場をつくります。</p></article>
+      </div>
+    </section>
+  `;
+}
+
+function contactPage() {
+  return `
+    ${pageHero("contact us", "SAKURA祭りへのお問い合わせはこちらからお願いします。")}
+    <section class="section">
+      <div class="container split">
+        <div>
+          <p class="notice">メール: ${site.contactEmail}</p>
+          ${externalLinks()}
+        </div>
+        <form class="form-card form-grid" data-form="contact">
+          <div class="field"><label for="name">名前</label><input id="name" name="name" autocomplete="name" required></div>
+          <div class="field"><label for="email">メールアドレス</label><input id="email" name="email" type="email" autocomplete="email" required></div>
+          <div class="field"><label for="subject">件名</label><input id="subject" name="subject" required></div>
+          <div class="field"><label for="message">お問い合わせ内容</label><textarea id="message" name="message" required></textarea></div>
+          <button class="btn primary full" type="submit">送信する</button>
+          <p class="form-status" hidden>送信デモです。実際の送信処理はPhase 3で接続します。</p>
+        </form>
+      </div>
+    </section>
+  `;
+}
+
+const pages = {
+  "/": topPage,
+  "/about-sakura/": aboutSakuraPage,
+  "/projects/": projectsOverviewPage,
+  "/projects/recommend/": recommendPage,
+  "/projects/search/": projectSearchPage,
+  "/history/": historyPage,
+  "/guide/": guidePage,
+  "/guide/access/": accessPage,
+  "/guide/rules/": rulesPage,
+  "/qa/": qaPage,
+  "/about-us/": aboutUsPage,
+  "/about-us/gajumaru/": gajumaruPage,
+  "/about-us/contact/": contactPage,
+};
+
+function render() {
+  const current = normalizePath(window.location.pathname);
+  const page = pages[current] || topPage;
+  document.querySelector("#app").innerHTML = `
+    <div class="site-shell">
+      ${header(current)}
+      <main>${page()}</main>
+      ${footer()}
+    </div>
+  `;
+  bindInteractions();
+}
+
+function bindInteractions() {
+  const toggle = document.querySelector(".menu-toggle");
+  const menu = document.querySelector(".mobile-menu");
+  if (toggle && menu) {
+    toggle.addEventListener("click", () => {
+      const open = menu.classList.toggle("open");
+      document.body.classList.toggle("menu-open", open);
+      toggle.setAttribute("aria-expanded", String(open));
+    });
+  }
+
+  document.querySelectorAll(".qa-question").forEach((buttonElement) => {
+    buttonElement.addEventListener("click", () => {
+      const item = buttonElement.closest(".qa-item");
+      const open = item.classList.toggle("open");
+      buttonElement.setAttribute("aria-expanded", String(open));
+      buttonElement.querySelector(".qa-symbol").textContent = open ? "閉じる" : "開く";
+    });
+  });
+
+  document.querySelectorAll("form[data-form]").forEach((form) => {
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const status = form.querySelector(".form-status");
+      if (status) status.hidden = false;
+      form.reset();
+    });
+  });
+
+  bindProjectFilters();
+  bindHeroCarousel();
+}
+
+function bindHeroCarousel() {
+  const carousel = document.querySelector("[data-hero-carousel]");
+  if (!carousel) return;
+
+  const track = carousel.querySelector("[data-hero-track]");
+  const slides = [...carousel.querySelectorAll(".hero-slide")];
+  const dots = [...carousel.querySelectorAll("[data-carousel-dot]")];
+  const prev = carousel.querySelector("[data-carousel-prev]");
+  const next = carousel.querySelector("[data-carousel-next]");
+  if (!track || slides.length === 0) return;
+
+  let current = 0;
+  let startX = 0;
+  let pointerDown = false;
+  let autoTimer;
+
+  const update = (index) => {
+    current = (index + slides.length) % slides.length;
+    track.style.transform = `translateX(-${current * 100}%)`;
+    dots.forEach((dot, dotIndex) => {
+      const active = dotIndex === current;
+      dot.classList.toggle("active", active);
+      dot.setAttribute("aria-current", String(active));
+    });
+  };
+
+  const restart = () => {
+    window.clearInterval(autoTimer);
+    autoTimer = window.setInterval(() => update(current + 1), 5200);
+  };
+
+  prev?.addEventListener("click", () => {
+    update(current - 1);
+    restart();
+  });
+
+  next?.addEventListener("click", () => {
+    update(current + 1);
+    restart();
+  });
+
+  dots.forEach((dot) => {
+    dot.addEventListener("click", () => {
+      update(Number(dot.dataset.carouselDot));
+      restart();
+    });
+  });
+
+  carousel.addEventListener("pointerdown", (event) => {
+    pointerDown = true;
+    startX = event.clientX;
+    carousel.setPointerCapture?.(event.pointerId);
+  });
+
+  carousel.addEventListener("pointerup", (event) => {
+    if (!pointerDown) return;
+    pointerDown = false;
+    const diff = event.clientX - startX;
+    if (Math.abs(diff) > 44) {
+      update(diff < 0 ? current + 1 : current - 1);
+      restart();
+    }
+  });
+
+  carousel.addEventListener("pointercancel", () => {
+    pointerDown = false;
+  });
+
+  update(0);
+  restart();
+}
+
+function bindProjectFilters() {
+  const panel = document.querySelector("[data-filter-panel]");
+  const list = document.querySelector("[data-project-list]");
+  if (!panel || !list) return;
+
+  const search = panel.querySelector("#project-search");
+  const category = panel.querySelector("#category-filter");
+  const time = panel.querySelector("#time-filter");
+  const place = panel.querySelector("#place-filter");
+  const empty = document.querySelector("[data-empty]");
+
+  const apply = () => {
+    const keyword = search.value.trim().toLowerCase();
+    let visibleCount = 0;
+    list.querySelectorAll(".project-card").forEach((card) => {
+      const text = card.textContent.toLowerCase();
+      const categoryMatch = category.value === "すべて" || card.dataset.category === category.value;
+      const placeMatch = place.value === "すべて" || card.dataset.place === place.value;
+      const timeValue = card.dataset.time;
+      const timeMatch =
+        time.value === "すべて" ||
+        (time.value === "午前" && timeValue.includes("10")) ||
+        (time.value === "午後" && !timeValue.includes("10") && !timeValue.includes("終日")) ||
+        (time.value === "終日" && timeValue.includes("終日"));
+      const keywordMatch = !keyword || text.includes(keyword);
+      const show = categoryMatch && placeMatch && timeMatch && keywordMatch;
+      card.hidden = !show;
+      if (show) visibleCount += 1;
+    });
+    if (empty) empty.hidden = visibleCount !== 0;
+  };
+
+  [search, category, time, place].forEach((control) => control.addEventListener("input", apply));
+}
+
+render();
+
+export { routeShells };
