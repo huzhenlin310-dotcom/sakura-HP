@@ -188,6 +188,21 @@ const nav = [
 let heroCarouselTimer;
 const languageKey = "sakura-site-language";
 let currentLang = getStoredLanguage();
+const basePath = getBasePath();
+
+function getBasePath() {
+  const githubPagesProjectPath = "/sakura-HP";
+  const path = window.location.pathname;
+  if (window.location.hostname.endsWith("github.io") && (path === githubPagesProjectPath || path.startsWith(`${githubPagesProjectPath}/`))) {
+    return githubPagesProjectPath;
+  }
+  return "";
+}
+
+function sitePath(path) {
+  if (/^(https?:|mailto:|tel:|#)/.test(path) || !path.startsWith("/")) return path;
+  return `${basePath}${path}`;
+}
 
 const text = {
   ja: {
@@ -501,8 +516,12 @@ function currentHeroPhotos() {
 }
 
 function normalizePath(pathname) {
-  if (!pathname || pathname === "/index.html") return "/";
-  let path = pathname.endsWith("/") ? pathname : `${pathname}/`;
+  let normalized = pathname || "/";
+  if (basePath && (normalized === basePath || normalized.startsWith(`${basePath}/`))) {
+    normalized = normalized.slice(basePath.length) || "/";
+  }
+  if (normalized === "/index.html") return "/";
+  let path = normalized.endsWith("/") ? normalized : `${normalized}/`;
   if (path.endsWith("/index.html/")) path = path.replace("/index.html/", "/");
   return path;
 }
@@ -514,14 +533,14 @@ function isActive(current, href) {
 
 function header(current) {
   const navLinks = nav
-    .map(([label, href]) => `<a class="nav-link ${isActive(current, href) ? "active" : ""}" href="${href}">${localized(label)}</a>`)
+    .map(([label, href]) => `<a class="nav-link ${isActive(current, href) ? "active" : ""}" href="${sitePath(href)}">${localized(label)}</a>`)
     .join("");
   const languageToggle = `<button class="language-toggle" type="button" data-language-toggle aria-label="${t("langAria")}">${t("langToggle")}</button>`;
 
   return `
     <header class="site-header">
       <div class="header-inner">
-        <a class="brand" href="/" aria-label="${t("brandAria")}">
+        <a class="brand" href="${sitePath("/")}" aria-label="${t("brandAria")}">
           <span class="brand-mark">桜</span>
           <span>${t("brand")}</span>
         </a>
@@ -543,7 +562,7 @@ function footer() {
     <footer class="site-footer">
       <div class="container footer-grid">
         <div>
-          <a class="brand" href="/">
+          <a class="brand" href="${sitePath("/")}">
             <span class="brand-mark">桜</span>
             <span>${t("brand")}</span>
           </a>
@@ -554,7 +573,7 @@ function footer() {
           <a href="${site.links.gajumaru}" target="_blank" rel="noreferrer">${t("gajumaruLink")}</a>
           <a href="${site.links.jaist}" target="_blank" rel="noreferrer">${t("jaistLink")}</a>
           <a href="${site.links.momiji}" target="_blank" rel="noreferrer">${t("momijiLink")}</a>
-          <a href="/about-us/contact/">contact us</a>
+          <a href="${sitePath("/about-us/contact/")}">contact us</a>
           <a href="${site.links.instagram}" target="_blank" rel="noreferrer">${t("snsLink")}</a>
         </div>
       </div>
@@ -572,7 +591,7 @@ function sectionTitle(title, lead) {
 }
 
 function button(label, href, variant = "primary", extra = "") {
-  return `<a class="btn ${variant} ${extra}" href="${href}">${label}</a>`;
+  return `<a class="btn ${variant} ${extra}" href="${sitePath(href)}">${label}</a>`;
 }
 
 function projectCard(project, showReason = false) {
